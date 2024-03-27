@@ -27,59 +27,43 @@ public class Snail {
      *         returns an empty array if array2d is not square.
      */
     public static int[] flattenSnail(int[][] array2d) {
-        if(array2d==null){
-            int[] out = new int[0];
-            return out;
-        }
-        int f=0;
-        for(int i=0;i<array2d.length;i++){
-            if(array2d[i].length != array2d.length){
-                f=1;
-                break;
-            }
-        }
-        System.out.println(f);
-        if(f==1 || array2d == null){
-            int[] out = new int[0];
-            return out;
+        int len = array2d.length;
+        int[] returnArr = new int[len * len];
+        if (array2d == null){
+            return returnArr;
         }
 
-        int[] out = new int[array2d.length * array2d.length];
-        int i=0,j=0,dir=0;
-        int cnt=0;
-        int x=0;
-        while(cnt<array2d.length*array2d.length) {
-            out[cnt]=array2d[i][j];
-            cnt++;
-            if(dir==0){
-                if(j==array2d.length-1-x){
-                    dir = 1;
-                    i++;
+
+        int top = 0, bottom = len - 1, left = 0, right = len - 1;
+        int count = 0;
+        while (top <= bottom && left <= right) {
+            for (int i = left; i <= right; i++) {
+                returnArr[count] = array2d[top][i];
+                count++;
+            }
+            top++;
+            for (int i = top; i <= bottom; i++) {
+                returnArr[count] = array2d[i][right];
+                count++;
+            }
+            right--;
+
+            if (top <= bottom) {
+                for (int i = right; i >= left; i--) {
+                    returnArr[count] = array2d[bottom][i];
+                    count++;
                 }
-                else j++;
+                bottom--;
             }
-            else if(dir==1){
-                if(i==array2d.length-1-x){
-                    dir = 2;
-                    j--;
-                }else i++;
-            }
-            else if(dir==2){
-                if(j==x){
-                    dir = 3;
-                    i--;
-                    x++;
-                }else j--;
-            }
-            else{
-                if(i==x){
-                    dir = 0;
-                    j++;
-                }else i--;
+            if (left <= right) {
+                for (int i = bottom; i >= top; i--) {
+                    returnArr[count] = array2d[i][left];
+                    count++;
+                }
+                left++;
             }
         }
-        print1dArray(out);
-        return out;
+        return returnArr;
     }
     /**
      *
@@ -110,45 +94,42 @@ public class Snail {
      *         returns an empty 2d array if the length of array1d is not a perfect square.
      */
     public static int[][] makeSnail(int[] array1d) {
-        if (array1d==null || !isPerfectSquare(array1d)) return new int[][]{};
-        int s = (int) Math.sqrt(array1d.length);
-        int[][] temp;
-        if(array1d.length%2==0) temp = new int[2][2];
-        else {
-            temp = new int[][]{
-                    new int[3],
-                    new int[]{0,array1d[array1d.length-1],0},
-                    new int[3]
-            };
-            array1d = Arrays.copyOf(array1d, array1d.length-1);
+
+        if (array1d == null){
+            return new int[0][0];
         }
-        boolean done = false;
-        int x = array1d.length-1;
-        while (!done) {
-            int max = temp.length;
-            for (int i = 0; i < max-1; i++) {
-                temp[1+i][0]=array1d[x--];
+        int len = array1d.length;
+        int[][] returnArr = new int[(int) Math.sqrt(len)][(int) Math.sqrt(len)];
+
+
+        int top = 0, bottom = len - 1, left = 0, right = len - 1;
+        int count = 0;
+        while (count < len) {
+            for (int i = left; i <= right; i++) {
+                returnArr[top][i] = array1d[count];
+                count++;
             }
-            for (int i = 0; i < max-1; i++) {
-                temp[max-1][i+1]=array1d[x--];
+            top++;
+            for (int i = top; i <= bottom; i++) {
+                returnArr[top][i] = array1d[count];
+                count++;
             }
-            for (int i = 0; i < max-1; i++) {
-                temp[max-i-2][max-1]=array1d[x--];
+            right--;
+
+            for (int i = right; i >= left; i--) {
+                returnArr[bottom][i] = array1d[count];
+                count++;
             }
-            for (int i = 0; i < max-1; i++) {
-                temp[0][max-i-2]=array1d[x--];
+            bottom--;
+
+            // Traverse left column
+            for (int i = bottom; i >= top; i--) {
+                returnArr[i][left] = array1d[count];
+                count++;
             }
-            if (temp.length==s) {
-                done=true;
-                continue;
-            }
-            int[][] bigger = new int[max+2][max+2];
-            for (int j = 0; j < max; j++) {
-                System.arraycopy(temp[j], 0, bigger[1 + j], 1, max);
-            }
-            temp = bigger;
+            left++;
         }
-        return temp;
+        return returnArr;
     }
 
     /**
